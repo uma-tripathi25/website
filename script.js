@@ -1,12 +1,31 @@
+// ====== TAP TO START MUSIC ======
+const tapMessage = document.getElementById("tapMessage");
+const bgMusic = document.getElementById("bgMusic");
+
+function startMusic() {
+  bgMusic.volume = 0.5;
+  bgMusic.play().then(() => {
+    // Hide overlay after successful playback
+    tapMessage.classList.add("hidden");
+    document.removeEventListener("click", startMusic);
+    document.removeEventListener("touchstart", startMusic);
+  }).catch(err => {
+    console.log("Playback blocked:", err);
+  });
+}
+
+// Wait for first user interaction
+document.addEventListener("click", startMusic);
+document.addEventListener("touchstart", startMusic);
+
 // ====== ELEMENTS ======
 const countdownEl = document.getElementById("countdown");
 const messageEl = document.getElementById("birthdayMessage");
 const titleEl = document.getElementById("mainTitle");
 const textEl = document.getElementById("countdownText");
-const bgMusic = document.getElementById("bgMusic");
 
 // ====== TARGET DATE ======
-const targetDate = new Date("October 28, 2025 00:00:00").getTime();
+const targetDate = new Date("November 22, 2025 00:00:00").getTime();
 
 // ====== COUNTDOWN ======
 function updateCountdown() {
@@ -40,11 +59,10 @@ setInterval(updateCountdown, 1000);
 
 // ====== MUSIC ======
 function playMusic() {
-  bgMusic.volume = 0.5;
-  bgMusic.play().catch(() => {
-    // fallback for autoplay restrictions
-    document.body.addEventListener("click", () => bgMusic.play());
-  });
+  if (bgMusic.paused) {
+    bgMusic.volume = 0.5;
+    bgMusic.play().catch(err => console.log("Playback blocked:", err));
+  }
 }
 
 // ====== HEARTS ======
@@ -83,7 +101,10 @@ function startHearts() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     hearts.forEach(h => {
       h.y -= h.speed;
-      if (h.y < -10) { h.y = canvas.height + 10; h.x = Math.random() * canvas.width; }
+      if (h.y < -10) {
+        h.y = canvas.height + 10;
+        h.x = Math.random() * canvas.width;
+      }
       drawHeart(h.x, h.y, h.size, h.color);
     });
     requestAnimationFrame(animate);
